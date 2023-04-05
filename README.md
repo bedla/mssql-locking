@@ -247,7 +247,7 @@ freed from the lock.
 case execution plan has to go record one by one to check if it fulfills condition of `WHERE` statement. And because we
 have beginning of the table locked by first transaction Tx1 we have to wait until lock are freed.
 
-![rowlock error Diagram-NO INDEX.drawio.png](rowlock error Diagram-NO INDEX.drawio.png)
+![rowlock-error-Diagram-NO_INDEX.drawio.png](rowlock-error-Diagram-NO_INDEX.drawio.png)
 
 #### Update on table with index
 
@@ -261,4 +261,4 @@ transaction Tx1 to finish**.
 **Answer** is pretty simple: It is because we are updating records based on column that does have index. In that
 case execution plan is selecting records based on particular index and tables rows are not locked.
 
-![rowlock error Diagram-WITH INDEX.drawio.png](rowlock error Diagram-WITH INDEX.drawio.png)
+![rowlock-error-Diagram-WITH_INDEX.drawio.png](rowlock-error-Diagram-WITH_INDEX.drawio.png)
