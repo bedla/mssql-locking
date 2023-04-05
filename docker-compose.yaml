@@ -1,0 +1,65 @@
+version: "3.9"
+services:
+  mssql-db:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "Password123.A"
+    ports:
+      - "1433:1433"
+    networks:
+      - my-network
+    healthcheck:
+      test: [ "CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost,1433", "-U", "sa", "-P", "Password123.A", "-Q", "SELECT 1" ]
+      interval: 1s
+      retries: 30
+    deploy:
+      resources:
+        limits:
+          # https://stackoverflow.com/a/57135933/535560
+          memory: 1536M
+  mssql-db-setup-locking:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    #  seems service is ready after entrypoint script exists & then depends_on of liquibase will start new container
+    entrypoint: [ "/opt/mssql-tools/bin/sqlcmd", "-S", "mssql-db,1433", "-U", "sa", "-P", "Password123.A", "-i", "/db-migration/create-db-locking.sql" ]
+    volumes:
+      - ./sql:/db-migration
+    networks:
+      - my-network
+    depends_on:
+      mssql-db:
+        condition: service_healthy
+  mssql-db-setup-txwait:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    #  seems service is ready after entrypoint script exists & then depends_on of liquibase will start new container
+    entrypoint: [ "/opt/mssql-tools/bin/sqlcmd", "-S", "mssql-db,1433", "-U", "sa", "-P", "Password123.A", "-i", "/db-migration/create-db-txwait.sql" ]
+    volumes:
+      - ./sql:/db-migration
+    networks:
+      - my-network
+    depends_on:
+      mssql-db:
+        condition: service_healthy
+  mssql-db-setup-txwait-mvcc:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    #  seems service is ready after entrypoint script exists & then depends_on of liquibase will start new container
+    entrypoint: [ "/opt/mssql-tools/bin/sqlcmd", "-S", "mssql-db,1433", "-U", "sa", "-P", "Password123.A", "-i", "/db-migration/create-db-txwait-mvcc.sql" ]
+    volumes:
+      - ./sql:/db-migration
+    networks:
+      - my-network
+    depends_on:
+      mssql-db:
+        condition: service_healthy
+  liquibase:
+    image: liquibase/liquibase
+    command: [ "--url=jdbc:sqlserver://mssql-db:1433;databaseName=LockingDB;username=sa;password=Password123.A;encrypt=true;trustServerCertificate=true", "--changeLogFile=./changelog/changelog.xml", "update" ]
+    volumes:
+      - ./sql:/liquibase/changelog
+    networks:
+      - my-network
+    depends_on:
+      - mssql-db-setup-locking
+
+networks:
+  my-network:

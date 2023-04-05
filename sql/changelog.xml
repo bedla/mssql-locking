@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.7.xsd">
+
+    <changeSet id="0" author="bedla">
+        <sql dbms="mssql" endDelimiter="GO">
+            CREATE SCHEMA foo
+        </sql>
+    </changeSet>
+
+    <changeSet id="4" author="bedla">
+        <createTable tableName="FOO_LOCK_TABLE_NO_PK" schemaName="foo">
+            <column name="ID" type="int" autoIncrement="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="STATUS" type="varchar(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="EXECUTION_START" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="EXECUTION_END" type="datetime"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="5" author="bedla">
+        <createTable tableName="FOO_LOCK_TABLE_PK" schemaName="foo">
+            <column name="ID" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="STATUS" type="varchar(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="EXECUTION_START" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="EXECUTION_END" type="datetime"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
